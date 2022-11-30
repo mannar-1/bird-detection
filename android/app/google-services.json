@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "449899497982",
+    "project_id": "bird-dfd7b",
+    "storage_bucket": "bird-dfd7b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:449899497982:android:cfc7f35640be6481a198af",
+        "android_client_info": {
+          "package_name": "com.example.birddetection"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "449899497982-bnoo5eg516tbaio24ia7ajv6vtf9efg4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB0_wvU4FqdMfHkUbQEcaC9RUfGDeh6p6U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "449899497982-bnoo5eg516tbaio24ia7ajv6vtf9efg4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
