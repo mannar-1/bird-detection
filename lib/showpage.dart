@@ -41,6 +41,7 @@ class _ShowpageState extends State<Showpage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       appBar: AppBar(
         centerTitle: true,
         shadowColor: Colors.black,
@@ -48,107 +49,124 @@ class _ShowpageState extends State<Showpage> {
         title: const Text("Aves"),
         titleTextStyle: const TextStyle(fontWeight: FontWeight.w900,fontSize: 20.0),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: SingleChildScrollView(
-          child:Column(
-            children: [
-              path!=""?Container(
-                height:300 ,
-                width:MediaQuery.of(context).size.width ,
-                decoration: BoxDecoration(image: DecorationImage(image: FileImage(File(path)))),
-              ):Container(
-                  height:300 ,
-                  width:MediaQuery.of(context).size.width ,
-                  decoration: BoxDecoration(image: DecorationImage(image: AssetImage('assets/emp.png'))),
-              ),
-              SizedBox(height: 20,),
-              FloatingActionButton.extended(label: Text("Predict"),onPressed: getImage()  ),
-              SizedBox(height: 20,),
-              FloatingActionButton.extended(label: Text("View more"),onPressed:(){
-                Navigator.push(context,MaterialPageRoute(builder: (context) => wikiPedia(info.weblink[category!.label]!),));
-              }),
-              Text(
-                category != null ? category!.label: '',
+      body:  Stack(
+
+          children: [
+               Container(
+                 decoration: BoxDecoration(
+                    gradient: LinearGradient(colors: [Colors.orange,Colors.green,Colors.black,],begin:Alignment.bottomCenter,end: Alignment.topCenter )
 
 
-
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-              ),
-
-              SizedBox(
-                height: 8,
-              ),
-              Text(
-                category != null
-                    ? 'Confidence: ${category!.score.toStringAsFixed(3)}'
-                    : '',
-                style: TextStyle(fontSize: 16),
-              ),
-              SizedBox(height: 20,),
-              Text('History',style: TextStyle(fontSize: 33)),
-              Container(
-                height: 50,
-                child:TextField(
-                  controller: search,
-                  onChanged: (val) => {
-                    setState((){
-                      srch=val;
-                    })
-                  },
-                  cursorColor: Colors.black87,
-                  decoration:InputDecoration(
-                    contentPadding: EdgeInsets.symmetric(vertical:10.0 ,horizontal:10.0 ),
-                    hintText: "Search",
-
-
-                    suffixIcon: Icon(Icons.search_sharp),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(20.0)),
+                 ),
+               ),
+            SingleChildScrollView(
+              child:Column(
+                children: [
+                  path!=""?Container(
+                    height:300 ,
+                    width:MediaQuery.of(context).size.width*0.7 ,
+                    decoration: BoxDecoration(image: DecorationImage(image: FileImage(File(path)),)),
+                  ):Container(
+                    height:300 ,
+                    width:MediaQuery.of(context).size.width*0.8 ,
+                    decoration: BoxDecoration(image: DecorationImage(image: AssetImage('assets/emp.png'),),),
                   ),
-                ),
+                  SizedBox(height: 10,),
+                  Row(mainAxisAlignment: MainAxisAlignment.end,children: [FloatingActionButton.extended( backgroundColor:Colors.green,label: Text("Predict"),onPressed: getImage()  ),SizedBox(width: 130,),
+                  ],),
+                                    SizedBox(height: 20,),
+                  FloatingActionButton.extended(  backgroundColor:Colors.green,label: Text("View more"),onPressed:(){
+                    Navigator.push(context,MaterialPageRoute(builder: (context) => wikiPedia(info.weblink[category!.label]!),));
+                  }),
+                  SizedBox(height: 15,),
+                  Text(
+                    category != null ? category!.label: '',
+
+
+
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600,color: Colors.white),
+                  ),
+
+                  SizedBox(
+                    height: 8,
+                  ),
+                  Text(
+                    category != null
+                        ? 'Confidence: ${category!.score.toStringAsFixed(3)}'
+                        : '',
+                    style: TextStyle(fontSize: 16,color: Colors.white),
+                  ),
+                  SizedBox(height: 20,),
+                  Text('History',style: TextStyle(fontSize: 33,),),
+                  Container(
+                    height: 50,
+                    child:TextField(
+                      controller: search,
+                      onChanged: (val) => {
+                        setState((){
+                          srch=val;
+                        })
+                      },
+                      cursorColor: Colors.black87,
+                      decoration:InputDecoration(
+                        contentPadding: EdgeInsets.symmetric(vertical:10.0 ,horizontal:10.0 ),
+                        hintText: "Search",
+
+
+                        suffixIcon: Icon(Icons.search_sharp),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(20.0)),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 30,),
+
+                  SingleChildScrollView(
+                    child: StreamBuilder<QuerySnapshot>(stream: FirebaseFirestore.instance.collection(mail!).snapshots(),
+                      builder: (context,AsyncSnapshot<QuerySnapshot> snapshot){
+                        if(snapshot.connectionState == ConnectionState.waiting){
+                          return const Center(child: CircularProgressIndicator(),
+                          );
+                        }
+                        if(snapshot.hasData){
+                          return  ListView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemCount: snapshot.data!.docs.length,
+                            itemBuilder: (context, index) {
+                              var data=snapshot.data!.docs[index].data() as Map<String,dynamic>;
+                              if(srch.isEmpty){
+                                return studentCard(data);
+                              }
+                              if(data['name'].toString().toLowerCase().contains(srch.toLowerCase())){
+                                return studentCard(data);
+                              }
+                              return ColoredBox(color: Colors.white);
+
+                            },
+                          );
+                        }
+                        return Text("No Details to View", style: GoogleFonts.nunito(fontSize: 17,color:Colors.white ),);
+                      },
+                    ),
+                  )
+
+                ],
               ),
-              SizedBox(height: 30,),
 
-              SingleChildScrollView(
-                child: StreamBuilder<QuerySnapshot>(stream: FirebaseFirestore.instance.collection(mail!).snapshots(),
-                  builder: (context,AsyncSnapshot<QuerySnapshot> snapshot){
-                    if(snapshot.connectionState == ConnectionState.waiting){
-                      return const Center(child: CircularProgressIndicator(),
-                      );
-                    }
-                    if(snapshot.hasData){
-                      return  ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: snapshot.data!.docs.length,
-                        itemBuilder: (context, index) {
-                          var data=snapshot.data!.docs[index].data() as Map<String,dynamic>;
-                          if(srch.isEmpty){
-                            return studentCard(data);
-                          }
-                          if(data['name'].toString().toLowerCase().contains(srch.toLowerCase())){
-                            return studentCard(data);
-                          }
-                          return ColoredBox(color: Colors.white);
-
-                        },
-                      );
-                    }
-                    return Text("No Details to View", style: GoogleFonts.nunito(fontSize: 17,color:Colors.white ),);
-                  },
-                ),
-              )
-
-            ],
-          ),
-
+            ),
+          ],
         ),
-      ),
+
+
       floatingActionButton: FloatingActionButton.extended(
+
         label: const Text("Select Image"),
+        backgroundColor: Colors.black,
         onPressed: (){
           showModalBottomSheet(context: context, builder: (context)=>Container(
+             decoration: BoxDecoration(gradient:  LinearGradient(colors: [Colors.orange,Colors.green,Colors.black,],begin:Alignment.bottomCenter,end: Alignment.topCenter )),
             width: MediaQuery.of(context).size.width,
-            height: 300,
+            height: 200,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

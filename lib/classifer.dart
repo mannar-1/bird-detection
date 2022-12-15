@@ -25,7 +25,7 @@ import 'package:tflite_flutter_helper/tflite_flutter_helper.dart';
 
   final String _labelsFileName = 'assets/labels.txt';
 
-  final int _labelsLength = 1001;
+  final int _labelsLength = 450;
 
   late var _probabilityProcessor;
 
